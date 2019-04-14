@@ -6,4 +6,8 @@ authors:
 
 crystal: 0.27.2
 
+dependencies:
+  crest:
+    github: mamantoha/crest
+
 license: MIT
