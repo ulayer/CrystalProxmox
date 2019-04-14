@@ -1,0 +1,9 @@
+name: CrystalProxmox
+version: 0.1.0
+
+authors:
+  - Nathaniel Suchy <me@lunorian.is>
+
+crystal: 0.27.2
+
+license: MIT
