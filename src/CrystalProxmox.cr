@@ -1,6 +1,8 @@
 require "json"
 require "http/client"
 
+require "./access/access.cr"
+
 # TODO: Write documentation for `CrystalProxmox`
 module CrystalProxmox
   VERSION = "0.1.0"
@@ -39,30 +41,12 @@ module CrystalProxmox
       @site.delete("/api2/json/#{path}", args)
     end
 
+    include CrystalProxmox::Access
+
+    # TODO: Move this to nodes/tasks folder
     def task_status(taskid : String)
       data = self.get("nodes/#{@node}/tasks/#{taskid}/status")
       return data
-    end
-
-    def show_ticket
-      @auth_params["cookie"]
-    end
-
-    def create_ticket : Hash(String, String)
-      response = @site.post("/api2/json/access/ticket", body: "username=#{@username}&password=#{@password}&realm=#{@realm}")
-      extract_ticket(response)
-    end
-
-    def extract_ticket(response : Object) : Hash(String, String)
-      data = JSON.parse(response.body)
-      ticket = data["data"]["ticket"]
-      csrf_prevention_token = data["data"]["CSRFPreventionToken"]
-      token = "PVEAuthCookie=" + ticket.as_s.gsub(/:/, "%3A").gsub(/=/, "%3D")
-      @connection_status = true
-      return {
-        "CSRFPreventionToken" => csrf_prevention_token.as_s,
-        "cookie"              => token,
-      }
     end
   end
 end
