@@ -1,5 +1,5 @@
-require "crest"
 require "json"
+require "http/client"
 
 # TODO: Write documentation for `CrystalProxmox`
 module CrystalProxmox
@@ -15,24 +15,24 @@ module CrystalProxmox
       @password = password       # password
       @realm = realm             # pve
       @connection_status = "error"
-      @site = Crest::Resource.new(@pve_cluster)
+      @site = HTTP::Client.new(URI.parse(@pve_cluster))
       @auth_params = create_ticket()
     end
 
     def get(path, args = Hash.new)
-      @site.get(path, args)
+      nil
     end
 
     def post(path, args = Hash.new)
-      @site.post(path, args)
+      @site.post "/api2/json/#{path}"
     end
 
     def put(path, args = Hash.new)
-      @site.put(path, args)
+      nil
     end
 
     def delete(path, args = Hash.new)
-      @site.delete(path, args)
+      nil
     end
 
     def show_ticket
@@ -40,16 +40,7 @@ module CrystalProxmox
     end
 
     def create_ticket : Hash(String, String)
-      response = @site["access/ticket"].post(
-        headers: {
-          "Content-Type" => "application/json",
-        },
-        params: {
-          "username" => @username,
-          "password" => @password,
-          "realm"    => @realm,
-        }
-      )
+      response = @site.post("/api2/json/access/ticket")
       extract_ticket(response)
     end
 
